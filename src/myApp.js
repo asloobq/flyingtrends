@@ -34,7 +34,7 @@ var Helloworld = cc.Layer.extend({
     circle:null,
 	batchNode:null,
 	ship:null,
-	bgNode:null,
+	mBgImage:null,
 	pipe:null,
 	pipe2:null,
 	heli:null,
@@ -66,8 +66,12 @@ var Helloworld = cc.Layer.extend({
         // ask director the window size
         var size = cc.Director.getInstance().getWinSize();
 
-	this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create("res/pause_button.png"));
-	this.mPauseButton.setPosition(size.width - 20, size.height - 20);
+		this.mBgImage = cc.Sprite.create(s_Clouds);
+		this.mBgImage.setPosition(size.width/2, size.height/2);
+		this.addChild(this.mBgImage);
+		
+	this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Pause));
+	this.mPauseButton.setPosition(size.width - 40, size.height - 40);
 	this.mPauseButton.setCallback(this.onPause, this);
 	this.mMenu = cc.Menu.create(this.mPauseButton);
 	this.mMenu.setPosition(0,0);
@@ -80,18 +84,18 @@ var Helloworld = cc.Layer.extend({
 	this.pipe2 = new Array();
 	this.data = new Array();
 
-	this.heli = cc.Sprite.create("res/heli1.png");
+	this.heli = cc.Sprite.create(s_Heli1);
 	this.lazyLayer.addChild(this.heli, 1);
 	
 	
 	for(var i = 0; i < this.count; i++) {
-		this.pipe[i] = cc.Sprite.create("res/pipe1.png");
+		this.pipe[i] = cc.Sprite.create(s_Pipe1);
 		this.lazyLayer.addChild(this.pipe[i], 1);
 		this.pipe[i].setScale(0.1);
 		//this.pipe[i].setAnchorPoint(1, 0.5);
 	}
 	for(var i = 0; i < this.count; i++) {
-		this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
+		this.pipe2[i] = cc.Sprite.create(s_Pipe2);
 		this.lazyLayer.addChild(this.pipe2[i], 1);
 		this.pipe2[i].setScale(0.1);
 	}
@@ -197,7 +201,7 @@ var Helloworld = cc.Layer.extend({
         // add the label as a child to this layer
         this.addChild(this.helloLabel, 5);
 
-	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create("res/restart_button.png"));
+	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Restart));
 	this.mRestartButton.setScale(0.5);
 	this.mRestartButton.setCallback(this.onRestart, this);
 	this.mRestartButton.setPosition(size.width/2, size.height/2 - 35);

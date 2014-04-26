@@ -33,6 +33,7 @@ var HomeLayer = cc.Layer.extend({
     startButton:null,
     optionsButton:null,
     creditsButton:null,
+	mBgImage:null,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -57,7 +58,9 @@ var HomeLayer = cc.Layer.extend({
         menu.setPosition(0,0);
         this.addChild(menu, 1);
         closeItem.setPosition(size.width - 20, 20);*/
-
+		this.mBgImage = cc.Sprite.create(s_Clouds);
+		this.mBgImage.setPosition(size.width/2, size.height/2);
+		this.addChild(this.mBgImage);
         /////////////////////////////
         // 3. add your codes below...
         // add a label shows "Hello World"

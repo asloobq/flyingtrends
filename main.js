@@ -58,7 +58,66 @@ var cocos2dApp = cc.Application.extend({
             director.replaceScene(new this.startScene());
         }, this);
 
+		this.fetchBBData();
+		
         return true;
-    }
+    },
+	fetchBBData:function () {
+		
+		//var url = "http://www.cs.binghamton.edu/~aquresh4/Misc/hackbu/";
+		//var method = "POST";
+		//var postData = "Some data";
+		//this.postToUrl(url, method, postData);
+		this.connectServer('149.125.231.116', '5383');
+	},
+	connectServer:function(url, portno) {
+		
+		var socket = new WebSocket('ws://149.125.231.116:5383');
+		socket.onopen = function() {
+			socket.send('hello');
+		}
+		
+		socket.onmessage = function(reply) {
+			console.log('reply = ', reply);
+		}
+	},
+	 postToUrl:function (url, method, postData) {
+		
+
+		// You REALLY want async = true.
+		// Otherwise, it'll block ALL execution waiting for server response.
+		var async = true;
+
+		var request = new XMLHttpRequest();
+
+		// Before we send anything, we first have to say what we will do when the
+		// server responds. This seems backwards (say how we'll respond before we send
+		// the request? huh?), but that's how Javascript works.
+		// This function attached to the XMLHttpRequest "onload" property specifies how
+		// the HTTP response will be handled. 
+		request.onload = function () {
+
+		   // Because of javascript's fabulous closure concept, the XMLHttpRequest "request"
+		   // object declared above is available in this function even though this function
+		   // executes long after the request is sent and long after this function is
+		   // instantiated. This fact is CRUCIAL to the workings of XHR in ordinary
+		   // applications.
+
+		   // You can get all kinds of information about the HTTP response.
+		   var status = request.status; // HTTP response status, e.g., 200 for "200 OK"
+		   var data = request.responseText; // Returned data, e.g., an HTML document.
+		   //console.log("response status= ", status);
+		   console.log("response data= ", data);
+		}
+
+		request.open(method, url, async);
+
+		request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		// Or... request.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
+		// Or... whatever
+
+		// Actually sends the request to the server.
+		request.send(postData);
+	},
 });
 var myApp = new cocos2dApp(HomeScene);
