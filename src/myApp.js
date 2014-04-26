@@ -41,6 +41,11 @@ var Helloworld = cc.Layer.extend({
 	speed:1,
     	heliSpeed:2,
     heliAnimation:null,
+    mIsRunning:true,
+    mRestartButton:null,
+    mPauseButton:null,
+    mMenu:null,
+    lazyLayer:null,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -52,74 +57,44 @@ var Helloworld = cc.Layer.extend({
         // ask director the window size
         var size = cc.Director.getInstance().getWinSize();
 
-        // add a "close" icon to exit the progress. it's an autorelease object
-        var closeItem = cc.MenuItemImage.create(
-            "res/CloseNormal.png",
-            "res/CloseSelected.png",
-            function () {
-                history.go(-1);
-            },this);
-        closeItem.setAnchorPoint(0.5, 0.5);
+	this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create("res/pause_button.png"));
+	this.mPauseButton.setPosition(size.width - 20, size.height - 20);
+	this.mPauseButton.setCallback(this.onPause, this);
+	this.mMenu = cc.Menu.create(this.mPauseButton);
+	this.mMenu.setPosition(0,0);
+	this.addChild(this.mMenu, 1);
 
-        var menu = cc.Menu.create(closeItem);
-        menu.setPosition(0,0);
-        this.addChild(menu, 1);
-        closeItem.setPosition(size.width - 20, 20);
-
-        /////////////////////////////
-        // 3. add your codes below...
-        // add a label shows "Hello World"
-        // create and initialize a label
-        this.helloLabel = cc.LabelTTF.create("Hello World", "Arial", 38);
-        // position the label on the center of the screen
-        this.helloLabel.setPosition(size.width / 2, 0);
-        // add the label as a child to this layer
-        this.addChild(this.helloLabel, 5);
-
-        var lazyLayer = cc.Layer.create();
-        this.addChild(lazyLayer);
+        this.lazyLayer = cc.Layer.create();
+        this.addChild(this.lazyLayer);
 
         // add "HelloWorld" splash screen"
         this.sprite = cc.Sprite.create("res/HelloWorld.png");
-		lazyLayer.addChild(this.sprite, 0);
+	this.lazyLayer.addChild(this.sprite, 0);
         this.sprite.setPosition(size.width / 2, size.height / 2);
         this.sprite.setScale(0.5);
 
-		this.pipe = new Array();
-		this.pipe2 = new Array();
-		this.data = new Array();
-		for(var i = 0; i < this.count; i++) {
-			this.data[i] = Math.floor((Math.random() *100) + 1);
-			//console.log("data[", i, "] = ", this.data[i]);
-		}
-		for(var i = 0; i < this.count; i++) {
-			//console.log("i ",i);
-			this.pipe[i] = cc.Sprite.create("res/pipe1.png");
-			lazyLayer.addChild(this.pipe[i], 1);
-			this.pipe[i].setPosition(0 + (18 * i), this.data[i]);
-			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
-			//console.log("x ",x);
-			this.pipe[i].setScale(0.1);
-		}
-		
-		for(var i = 0; i < this.count; i++) {
-			//console.log("i ",i);
-			this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
-			lazyLayer.addChild(this.pipe2[i], 1);
-			this.pipe2[i].setPosition(0 + (18 * i), this.data[i] + size.height*.75);
-			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
-			//console.log("x ",x);
-			this.pipe2[i].setScale(0.1);
-		}
-		
-		this.heli = cc.Sprite.create("res/heli.png");
-		lazyLayer.addChild(this.heli, 1);
-		this.heli.setPosition(size.width/2, size.height/2);
-		
-		
+	this.pipe = new Array();
+	this.pipe2 = new Array();
+	this.data = new Array();
+
+	this.heli = cc.Sprite.create("res/heli.png");
+	this.lazyLayer.addChild(this.heli, 1);
+	
+	
+	for(var i = 0; i < this.count; i++) {
+		this.pipe[i] = cc.Sprite.create("res/pipe1.png");
+		this.lazyLayer.addChild(this.pipe[i], 1);
+		this.pipe[i].setScale(0.1);
+	}
+	for(var i = 0; i < this.count; i++) {
+		this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
+		this.lazyLayer.addChild(this.pipe2[i], 1);
+		this.pipe2[i].setScale(0.1);
+	}
+	this.onRestart();	
         this.setTouchEnabled(true);
 	this.setKeyboardEnabled(true);
-		this.scheduleUpdate();
+	this.scheduleUpdate();
         return true;
     },
     buildAnimation:function() {
@@ -163,16 +138,18 @@ var Helloworld = cc.Layer.extend({
     },
 	update:function (dt) {
 		//if game is running then call update on pipe
-		for(var i = 0; i < this.count; i++) {
-			this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
-			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
+		if(this.mIsRunning) {
+			for(var i = 0; i < this.count; i++) {
+				this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
+				this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
+			}
+			if (this.isMouseDown) {
+				this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
+			} else {
+				this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
+			}
+			this.checkCollision();
 		}
-		if (this.isMouseDown) {
-			this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
-		} else {
-			this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
-		}
-		this.checkCollision();
 	},
 	 handleTouch:function(touchLocation)
     {
@@ -188,15 +165,64 @@ var Helloworld = cc.Layer.extend({
 		pipe1Rect = this.pipe[i].getBoundingBox();
 		if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
 			console.log("checkCollision collision with i = ", i);
-			this.heli.removeFromParent(true);
+			this.onCollision();
 			return;
 		}
 		pipe2Rect = this.pipe2[i].getBoundingBox();
 		if (cc.rectIntersectsRect(heliRect, pipe2Rect)) {
 			console.log("checkCollision collision with i = ", i);
-			this.heli.removeFromParent(true);
+			this.onCollision();
 			return;
 		}
+	}
+    },
+    onCollision:function() {
+	this.heli.setVisible(false);
+	    this.mIsRunning = false;
+	    this.onGameOver();
+    },
+    onGameOver:function() {
+        // add a label shows "Hello World"
+        // create and initialize a label
+        this.helloLabel = cc.LabelTTF.create("GAME OVER", "Arial", 38);
+        // position the label on the center of the screen
+	var size = cc.Director.getInstance().getWinSize();
+        this.helloLabel.setPosition(size.width / 2, size.height / 2);
+        // add the label as a child to this layer
+        this.addChild(this.helloLabel, 5);
+
+	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create("res/restart_button.png"));
+	this.mRestartButton.setScale(0.5);
+	this.mRestartButton.setCallback(this.onRestart, this);
+	this.mRestartButton.setPosition(size.width/2, size.height/2 - 30);
+	this.mMenu.addChild(this.mRestartButton);
+    },
+    onRestart:function() {
+	    console.log("restart");
+	    var size = cc.Director.getInstance().getWinSize();
+	    for(var i = 0; i < this.count; i++) {
+			this.data[i] = Math.floor((Math.random() *100) + 1);
+		}
+	    for(var i = 0; i < this.count; i++) {
+		this.pipe[i].setPosition(0 + (18 * i), this.data[i]);
+		}
+		
+	    for(var i = 0; i < this.count; i++) {
+		this.pipe2[i].setPosition(0 + (18 * i), this.data[i] + size.height*.75);
+		this.pipe2[i].setScale(0.1);
+	    }
+	    this.mIsRunning = true;
+	    this.heli.setVisible(true);
+	    this.heli.setPosition(size.width/2, size.height/2);
+	    this.mMenu.removeChild(this.mRestartButton);
+	    this.removeChild(this.helloLabel);
+    },
+    onPause:function() {
+	    console.log("onPause");
+	if(this.mIsRunning) {
+		this.mIsRunning = false;
+	} else {
+		this.mIsRunning = true;
 	}
     }
 });
