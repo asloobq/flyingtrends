@@ -38,7 +38,8 @@ var Helloworld = cc.Layer.extend({
 	heli:null,
 	count:100,
 	data:null,
-	speed:.5,
+	speed:1,
+    	heliSpeed:2,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -116,6 +117,7 @@ var Helloworld = cc.Layer.extend({
 		
 		
         this.setTouchEnabled(true);
+	this.setKeyboardEnabled(true);
 		this.scheduleUpdate();
         return true;
     },
@@ -125,6 +127,7 @@ var Helloworld = cc.Layer.extend({
     },
     onTouchesBegan:function (touches, event) {
         this.isMouseDown = true;
+	//this.heli.setPositionY(this.heli.getPositionY() + (this.speed * 20));
     },
     onTouchesMoved:function (touches, event) {
         if (this.isMouseDown) {
@@ -143,10 +146,23 @@ var Helloworld = cc.Layer.extend({
 		//if game is running then call update on pipe
 		for(var i = 0; i < this.count; i++) {
 			this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
-			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);
-			this.heli.setPositionY(this.heli.getPositionY() - this.speed*0.05);
+			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
 		}
-	}
+	if (this.isMouseDown) {
+		this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
+		} else {
+		this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
+		}
+	},
+	 handleTouch:function(touchLocation)
+    {
+       // if(touchLocation.x < 300)
+        //    this._currentRotation = 0;
+        //else
+        //    this._currentRotation = 180;
+	console.log("handleTouch x = ", touchLocation.x);
+    }
+
 });
 
 var HelloWorldScene = cc.Scene.extend({
