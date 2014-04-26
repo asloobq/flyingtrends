@@ -28,8 +28,8 @@ var Helloworld = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
     helloLabel:null,
+    mPausedLabel:null,
     circle:null,
-    sprite:null,
 	batchNode:null,
 	ship:null,
 	bgNode:null,
@@ -42,6 +42,7 @@ var Helloworld = cc.Layer.extend({
     	heliSpeed:2,
     heliAnimation:null,
     mIsRunning:true,
+    mIsGameOver:false,
     mRestartButton:null,
     mPauseButton:null,
     mMenu:null,
@@ -66,18 +67,12 @@ var Helloworld = cc.Layer.extend({
 
         this.lazyLayer = cc.Layer.create();
         this.addChild(this.lazyLayer);
-
-        // add "HelloWorld" splash screen"
-        this.sprite = cc.Sprite.create("res/HelloWorld.png");
-	this.lazyLayer.addChild(this.sprite, 0);
-        this.sprite.setPosition(size.width / 2, size.height / 2);
-        this.sprite.setScale(0.5);
-
+ 
 	this.pipe = new Array();
 	this.pipe2 = new Array();
 	this.data = new Array();
 
-	this.heli = cc.Sprite.create("res/heli.png");
+	this.heli = cc.Sprite.create("res/heli1.png");
 	this.lazyLayer.addChild(this.heli, 1);
 	
 	
@@ -194,8 +189,9 @@ var Helloworld = cc.Layer.extend({
 	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create("res/restart_button.png"));
 	this.mRestartButton.setScale(0.5);
 	this.mRestartButton.setCallback(this.onRestart, this);
-	this.mRestartButton.setPosition(size.width/2, size.height/2 - 30);
+	this.mRestartButton.setPosition(size.width/2, size.height/2 - 35);
 	this.mMenu.addChild(this.mRestartButton);
+        this.mIsGameOver = true;
     },
     onRestart:function() {
 	    console.log("restart");
@@ -212,6 +208,7 @@ var Helloworld = cc.Layer.extend({
 		this.pipe2[i].setScale(0.1);
 	    }
 	    this.mIsRunning = true;
+	    this.mIsGameOver = false;
 	    this.heli.setVisible(true);
 	    this.heli.setPosition(size.width/2, size.height/2);
 	    this.mMenu.removeChild(this.mRestartButton);
@@ -219,10 +216,22 @@ var Helloworld = cc.Layer.extend({
     },
     onPause:function() {
 	    console.log("onPause");
+	    if(this.mIsGameOver) {
+		    return;
+	    }
 	if(this.mIsRunning) {
 		this.mIsRunning = false;
+		        // create and initialize a label
+	        this.mPauseLabel = cc.LabelTTF.create("PAUSED", "Arial", 38);
+        	// position the label on the center of the screen
+		var size = cc.Director.getInstance().getWinSize();
+	        this.mPauseLabel.setPosition(size.width / 2, size.height / 2);
+	        // add the label as a child to this layer
+	        this.addChild(this.mPauseLabel, 5);
+
 	} else {
 		this.mIsRunning = true;
+		this.removeChild(this.mPauseLabel);
 	}
     }
 });
