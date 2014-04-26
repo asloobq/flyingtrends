@@ -148,11 +148,12 @@ var Helloworld = cc.Layer.extend({
 			this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
 			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
 		}
-	if (this.isMouseDown) {
-		this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
+		if (this.isMouseDown) {
+			this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
 		} else {
-		this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
+			this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
 		}
+		this.checkCollision();
 	},
 	 handleTouch:function(touchLocation)
     {
@@ -161,8 +162,24 @@ var Helloworld = cc.Layer.extend({
         //else
         //    this._currentRotation = 180;
 	console.log("handleTouch x = ", touchLocation.x);
+    },
+    checkCollision:function() {
+	heliRect = this.heli.getBoundingBox();
+	for(var i = 0; i < this.count; i++) {
+		pipe1Rect = this.pipe[i].getBoundingBox();
+		if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
+			console.log("checkCollision collision with i = ", i);
+			this.heli.removeFromParent(true);
+			return;
+		}
+		pipe2Rect = this.pipe2[i].getBoundingBox();
+		if (cc.rectIntersectsRect(heliRect, pipe2Rect)) {
+			console.log("checkCollision collision with i = ", i);
+			this.heli.removeFromParent(true);
+			return;
+		}
+	}
     }
-
 });
 
 var HelloWorldScene = cc.Scene.extend({
