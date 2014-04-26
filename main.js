@@ -64,17 +64,17 @@ var cocos2dApp = cc.Application.extend({
     },
 	fetchBBData:function () {
 		
-		//var url = "http://www.cs.binghamton.edu/~aquresh4/Misc/hackbu/";
-		//var method = "POST";
-		//var postData = "Some data";
+		var url = "http://149.125.231.116:5384";
+		var method = "GET";
+		var postData = "";
 		//this.postToUrl(url, method, postData);
-		this.connectServer('149.125.231.116', '5383');
+		this.connectServer('149.125.231.116', '5384');
 	},
 	connectServer:function(url, portno) {
 		
-		var socket = new WebSocket('ws://149.125.231.116:5383');
+		var socket = new WebSocket('ws://149.125.231.116:5384');
 		socket.onopen = function() {
-			socket.send('hello');
+			//socket.send('');
 		}
 		
 		socket.onmessage = function(reply) {
@@ -112,8 +112,8 @@ var cocos2dApp = cc.Application.extend({
 
 		request.open(method, url, async);
 
-		request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-		// Or... request.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
+		//request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		request.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
 		// Or... whatever
 
 		// Actually sends the request to the server.

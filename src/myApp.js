@@ -38,7 +38,7 @@ var Helloworld = cc.Layer.extend({
 	pipe:null,
 	pipe2:null,
 	heli:null,
-	count:100,
+	count:50,
 	data:null,
 	speed:2,
     	heliSpeed:2,
@@ -85,6 +85,8 @@ var Helloworld = cc.Layer.extend({
 	this.data = new Array();
 
 	this.heli = cc.Sprite.create(s_Heli1);
+	this.heli.setScale(0.5);
+	//this.heli.setScaleX(0.05);
 	this.lazyLayer.addChild(this.heli, 1);
 	
 	
@@ -151,6 +153,11 @@ var Helloworld = cc.Layer.extend({
 				this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
 				this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
 			}
+			
+			if(this.pipe[0].getPositionX() < 0) {
+				this.onRestart();
+			}
+			
 			if (this.isMouseDown) {
 				this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
 			} else {
