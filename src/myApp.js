@@ -34,6 +34,9 @@ var Helloworld = cc.Layer.extend({
 	ship:null,
 	bgNode:null,
 	pipe:null,
+	count:100,
+	data:null,
+	speed:3,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -78,10 +81,22 @@ var Helloworld = cc.Layer.extend({
         this.sprite.setPosition(size.width / 2, size.height / 2);
         this.sprite.setScale(0.5);
 
-		this.pipe = cc.Sprite.create("res/pipe1.png");
-		lazyLayer.addChild(this.pipe, 1);
-		this.pipe.setPosition(size.width/2, 0);
-		this.pipe.setScale(0.1);
+		this.pipe = new Array();
+		this.data = new Array();
+		for(var i = 0; i < this.count; i++) {
+			this.data[i] = Math.floor((Math.random() *100) + 1);
+			console.log("data[", i, "] = ", this.data[i]);
+		}
+		for(var i = 0; i < this.count; i++) {
+			console.log("i ",i);
+			this.pipe[i] = cc.Sprite.create("res/pipe1.png");
+			lazyLayer.addChild(this.pipe[i], 1);
+			this.pipe[i].setPosition(size.width/2 + (18 * i), this.data[i]);
+			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
+			//console.log("x ",x);
+			this.pipe[i].setScale(0.1);
+		}
+		
 		
         this.setTouchEnabled(true);
 		this.scheduleUpdate();
@@ -109,7 +124,9 @@ var Helloworld = cc.Layer.extend({
     },
 	update:function (dt) {
 		//if game is running then call update on pipe
-		this.pipe.setPositionX(this.pipe.getPositionX() - 1);
+		for(var i = 0; i < this.count; i++) {
+			this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
+		}
 	}
 });
 
