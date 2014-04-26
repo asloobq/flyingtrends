@@ -24,23 +24,15 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var Helloworld = cc.Layer.extend({
+var HomeLayer = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
     helloLabel:null,
     circle:null,
     sprite:null,
-	batchNode:null,
-	ship:null,
-	bgNode:null,
-	pipe:null,
-	pipe2:null,
-	heli:null,
-	count:100,
-	data:null,
-	speed:1,
-    	heliSpeed:2,
-    heliAnimation:null,
+    startButton:null,
+    optionsButton:null,
+    creditsButton:null,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -53,7 +45,7 @@ var Helloworld = cc.Layer.extend({
         var size = cc.Director.getInstance().getWinSize();
 
         // add a "close" icon to exit the progress. it's an autorelease object
-        var closeItem = cc.MenuItemImage.create(
+        /*var closeItem = cc.MenuItemImage.create(
             "res/CloseNormal.png",
             "res/CloseSelected.png",
             function () {
@@ -64,7 +56,7 @@ var Helloworld = cc.Layer.extend({
         var menu = cc.Menu.create(closeItem);
         menu.setPosition(0,0);
         this.addChild(menu, 1);
-        closeItem.setPosition(size.width - 20, 20);
+        closeItem.setPosition(size.width - 20, 20);*/
 
         /////////////////////////////
         // 3. add your codes below...
@@ -85,60 +77,28 @@ var Helloworld = cc.Layer.extend({
         this.sprite.setPosition(size.width / 2, size.height / 2);
         this.sprite.setScale(0.5);
 
-		this.pipe = new Array();
-		this.pipe2 = new Array();
-		this.data = new Array();
-		for(var i = 0; i < this.count; i++) {
-			this.data[i] = Math.floor((Math.random() *100) + 1);
-			//console.log("data[", i, "] = ", this.data[i]);
-		}
-		for(var i = 0; i < this.count; i++) {
-			//console.log("i ",i);
-			this.pipe[i] = cc.Sprite.create("res/pipe1.png");
-			lazyLayer.addChild(this.pipe[i], 1);
-			this.pipe[i].setPosition(0 + (18 * i), this.data[i]);
-			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
-			//console.log("x ",x);
-			this.pipe[i].setScale(0.1);
-		}
-		
-		for(var i = 0; i < this.count; i++) {
-			//console.log("i ",i);
-			this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
-			lazyLayer.addChild(this.pipe2[i], 1);
-			this.pipe2[i].setPosition(0 + (18 * i), this.data[i] + size.height*.75);
-			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
-			//console.log("x ",x);
-			this.pipe2[i].setScale(0.1);
-		}
-		
-		this.heli = cc.Sprite.create("res/heli.png");
-		lazyLayer.addChild(this.heli, 1);
-		this.heli.setPosition(size.width/2, size.height/2);
-		
-		
+	this.startButton = cc.MenuItemSprite.create(cc.Sprite.create("res/start_button.png"));
+	//this.startButton.setTarget(this, this.menuStartCallback);
+	this.startButton.setCallback(this.menuStartCallback, this);
+	this.optionsButton = cc.MenuItemSprite.create(cc.Sprite.create("res/options_button.png"));
+	this.creditsButton = cc.MenuItemSprite.create(cc.Sprite.create("res/credits_button.png"));
+	var menu = cc.Menu.create(this.startButton);
+	menu.addChild(this.optionsButton);
+	menu.addChild(this.creditsButton);
+	menu.setPosition(size.width / 2, size.height/2);
+	menu.alignItemsVerticallyWithPadding(50);
+	this.addChild(menu, 1);
+    //optionsButton:null,
+    //creditsButton:null
+
         this.setTouchEnabled(true);
-	this.setKeyboardEnabled(true);
-		this.scheduleUpdate();
+		this.setKeyboardEnabled(true);
         return true;
     },
-    buildAnimation:function() {
-	    //Not working
-	//create an animation object
-	var animation = cc.Animation.create();
-
-	//add a sprite frame to this animation
-	animation.addFrameWithFile("heli.png");
-
-	animation.addFrameWithFile("heli2.png");
-	
-	animation.setDelayPerUnit(2);
-
-	//create an action with this animation
-	var animate = cc.Animate.create(animation);
-
-	//run animate
-	this.heli.runAction(cc.RepeatForever.create(animate));
+    //start button callback
+    menuStartCallback:function (sender) {
+	console.log("start clicked");
+	cc.Director.getInstance().replaceScene(new HelloWorldScene);
     },
     // a selector callback
     menuCloseCallback:function (sender) {
@@ -161,50 +121,16 @@ var Helloworld = cc.Layer.extend({
     onTouchesCancelled:function (touches, event) {
         console.log("onTouchesCancelled");
     },
-	update:function (dt) {
-		//if game is running then call update on pipe
-		for(var i = 0; i < this.count; i++) {
-			this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
-			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
-		}
-		if (this.isMouseDown) {
-			this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
-		} else {
-			this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
-		}
-		this.checkCollision();
-	},
 	 handleTouch:function(touchLocation)
     {
-       // if(touchLocation.x < 300)
-        //    this._currentRotation = 0;
-        //else
-        //    this._currentRotation = 180;
-	console.log("handleTouch x = ", touchLocation.x);
-    },
-    checkCollision:function() {
-	heliRect = this.heli.getBoundingBox();
-	for(var i = 0; i < this.count; i++) {
-		pipe1Rect = this.pipe[i].getBoundingBox();
-		if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
-			console.log("checkCollision collision with i = ", i);
-			this.heli.removeFromParent(true);
-			return;
-		}
-		pipe2Rect = this.pipe2[i].getBoundingBox();
-		if (cc.rectIntersectsRect(heliRect, pipe2Rect)) {
-			console.log("checkCollision collision with i = ", i);
-			this.heli.removeFromParent(true);
-			return;
-		}
-	}
+		//console.log("handleTouch x = ", touchLocation.x);
     }
 });
 
-var HelloWorldScene = cc.Scene.extend({
+var HomeScene = cc.Scene.extend({
     onEnter:function () {
         this._super();
-        var layer = new Helloworld();
+        var layer = new HomeLayer();
         layer.init();
         this.addChild(layer);
     }
