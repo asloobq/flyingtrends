@@ -34,9 +34,11 @@ var Helloworld = cc.Layer.extend({
 	ship:null,
 	bgNode:null,
 	pipe:null,
+	pipe2:null,
+	heli:null,
 	count:100,
 	data:null,
-	speed:3,
+	speed:.5,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -82,20 +84,35 @@ var Helloworld = cc.Layer.extend({
         this.sprite.setScale(0.5);
 
 		this.pipe = new Array();
+		this.pipe2 = new Array();
 		this.data = new Array();
 		for(var i = 0; i < this.count; i++) {
 			this.data[i] = Math.floor((Math.random() *100) + 1);
-			console.log("data[", i, "] = ", this.data[i]);
+			//console.log("data[", i, "] = ", this.data[i]);
 		}
 		for(var i = 0; i < this.count; i++) {
-			console.log("i ",i);
+			//console.log("i ",i);
 			this.pipe[i] = cc.Sprite.create("res/pipe1.png");
 			lazyLayer.addChild(this.pipe[i], 1);
-			this.pipe[i].setPosition(size.width/2 + (18 * i), this.data[i]);
+			this.pipe[i].setPosition(0 + (18 * i), this.data[i]);
 			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
 			//console.log("x ",x);
 			this.pipe[i].setScale(0.1);
 		}
+		
+		for(var i = 0; i < this.count; i++) {
+			//console.log("i ",i);
+			this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
+			lazyLayer.addChild(this.pipe2[i], 1);
+			this.pipe2[i].setPosition(0 + (18 * i), this.data[i] + size.height*.75);
+			//var x = this.pipe[i].getContentSize()._width;//size.width/2 + (this.pipe[i].getContentSize().width * i);
+			//console.log("x ",x);
+			this.pipe2[i].setScale(0.1);
+		}
+		
+		this.heli = cc.Sprite.create("res/heli.png");
+		lazyLayer.addChild(this.heli, 1);
+		this.heli.setPosition(size.width/2, size.height/2);
 		
 		
         this.setTouchEnabled(true);
@@ -125,7 +142,9 @@ var Helloworld = cc.Layer.extend({
 	update:function (dt) {
 		//if game is running then call update on pipe
 		for(var i = 0; i < this.count; i++) {
-			this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
+			this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
+			this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);
+			this.heli.setPositionY(this.heli.getPositionY() - this.speed*0.05);
 		}
 	}
 });
