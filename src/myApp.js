@@ -24,6 +24,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+var EXPLODE_FILE = "res/explode.mp3";
+
 var Helloworld = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
@@ -38,7 +40,7 @@ var Helloworld = cc.Layer.extend({
 	heli:null,
 	count:100,
 	data:null,
-	speed:1,
+	speed:2,
     	heliSpeed:2,
     heliAnimation:null,
     mIsRunning:true,
@@ -47,11 +49,17 @@ var Helloworld = cc.Layer.extend({
     mPauseButton:null,
     mMenu:null,
     lazyLayer:null,
+    mAudioEngine:null,
     init:function () {
         //////////////////////////////
         // 1. super init first
         this._super();
-
+	
+	mAudioEngine = cc.AudioEngine.getInstance();
+        // set default volume
+        mAudioEngine.setEffectsVolume(0.5);
+        mAudioEngine.setMusicVolume(0.5);
+	cc.AudioEngine.getInstance().preloadEffect(EXPLODE_FILE);
         /////////////////////////////
         // 2. add a menu item with "X" image, which is clicked to quit the program
         //    you may modify it.
@@ -80,6 +88,7 @@ var Helloworld = cc.Layer.extend({
 		this.pipe[i] = cc.Sprite.create("res/pipe1.png");
 		this.lazyLayer.addChild(this.pipe[i], 1);
 		this.pipe[i].setScale(0.1);
+		//this.pipe[i].setAnchorPoint(1, 0.5);
 	}
 	for(var i = 0; i < this.count; i++) {
 		this.pipe2[i] = cc.Sprite.create("res/pipe2.png");
@@ -135,7 +144,7 @@ var Helloworld = cc.Layer.extend({
 		//if game is running then call update on pipe
 		if(this.mIsRunning) {
 			for(var i = 0; i < this.count; i++) {
-				this.pipe[i].setPositionX(this.pipe[i].getPositionX() + this.speed);
+				this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
 				this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
 			}
 			if (this.isMouseDown) {
@@ -172,9 +181,11 @@ var Helloworld = cc.Layer.extend({
 	}
     },
     onCollision:function() {
+    	//this.mAudioEngine.playEffect(EFFECT_FILE);
+	cc.AudioEngine.getInstance().playEffect(EXPLODE_FILE);
 	this.heli.setVisible(false);
-	    this.mIsRunning = false;
-	    this.onGameOver();
+	this.mIsRunning = false;
+	this.onGameOver();
     },
     onGameOver:function() {
         // add a label shows "Hello World"
@@ -197,20 +208,19 @@ var Helloworld = cc.Layer.extend({
 	    console.log("restart");
 	    var size = cc.Director.getInstance().getWinSize();
 	    for(var i = 0; i < this.count; i++) {
-			this.data[i] = Math.floor((Math.random() *100) + 1);
+			this.data[i] = Math.floor((Math.random() * 200) + 1);
 		}
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe[i].setPosition(0 + (18 * i), this.data[i]);
+		this.pipe[i].setPosition(size.width/2 + (18 * i), this.data[i]);
 		}
 		
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe2[i].setPosition(0 + (18 * i), this.data[i] + size.height*.75);
-		this.pipe2[i].setScale(0.1);
+		this.pipe2[i].setPosition(size.width/2 + (18 * i), this.data[i] + size.height*.75);
 	    }
 	    this.mIsRunning = true;
 	    this.mIsGameOver = false;
 	    this.heli.setVisible(true);
-	    this.heli.setPosition(size.width/2, size.height/2);
+	    this.heli.setPosition(size.width/4, size.height/2);
 	    this.mMenu.removeChild(this.mRestartButton);
 	    this.removeChild(this.helloLabel);
     },
