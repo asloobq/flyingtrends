@@ -41,8 +41,8 @@ var Helloworld = cc.Layer.extend({
 	heli:null,
 	count:50,
 	data:null,
-	speed:2,
-    	heliSpeed:2,
+	speed:1.5,
+    heliSpeed:1.5,
     heliAnimation:null,
     mIsRunning:true,
     mIsGameOver:false,
@@ -95,7 +95,6 @@ var Helloworld = cc.Layer.extend({
 		this.pipe[i] = cc.Sprite.create(s_Pipe1);
 		this.lazyLayer.addChild(this.pipe[i], 1);
 		this.pipe[i].setScale(0.1);
-		//this.pipe[i].setAnchorPoint(1, 0.5);
 	}
 	for(var i = 0; i < this.count; i++) {
 		this.pipe2[i] = cc.Sprite.create(s_Pipe2);
@@ -149,15 +148,19 @@ var Helloworld = cc.Layer.extend({
     },
 	update:function (dt) {
 		//if game is running then call update on pipe
+        var size = cc.Director.getInstance().getWinSize();
 		if(this.mIsRunning) {
 			for(var i = 0; i < this.count; i++) {
 				this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
 				this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
-			}
-			
-			if(this.pipe[0].getPositionX() < 0) {
-				this.onRestart();
-			}
+                if(this.pipe[i].getPositionX() < 0) {
+                    this.pipe[i].setPositionX(size.width/2 + (15 * i));
+                }
+                
+                if(this.pipe2[i].getPositionX() < 0) {
+                    this.pipe2[i].setPositionX(size.width/2 + (15 * i));
+                }
+			}	
 			
 			if (this.isMouseDown) {
 				this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
@@ -223,7 +226,7 @@ var Helloworld = cc.Layer.extend({
 	    console.log("restart");
 	    var size = cc.Director.getInstance().getWinSize();
 	    for(var i = 0; i < this.count; i++) {
-			this.data[i] = Math.floor((Math.random() * 200) + 1);
+			this.data[i] = Math.floor((Math.random() * 180) + 1);
 		}
 	    for(var i = 0; i < this.count; i++) {
 		this.pipe[i].setPosition(size.width/2 + (15 * i), this.data[i]);
