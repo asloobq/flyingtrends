@@ -8,6 +8,8 @@ var s_Heli1 = "res/heli4.png";
 var s_Pipe1 = "res/pipe1.png";
 var s_Pipe2 = "res/pipe2.png";
 var s_Restart = "res/restart_button.png";
+var s_Logo = "res/logo.png";
+var s_Gameover = "res/gameover.png"
 var g_resources = [
     //image
     s_HelloWorld,
@@ -20,6 +22,7 @@ var g_resources = [
 	s_Pipe1,
 	s_Pipe2,
 	s_Restart,
+	s_Logo,
     //plist
 
     //fnt

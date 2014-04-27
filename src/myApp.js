@@ -29,12 +29,13 @@ var EXPLODE_FILE = "res/explode.mp3";
 var Helloworld = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
-    helloLabel:null,
+    //helloLabel:null,
     mPausedLabel:null,
     circle:null,
 	batchNode:null,
 	ship:null,
 	mBgImage:null,
+	mGameOverImage:null,
 	pipe:null,
 	pipe2:null,
 	heli:null,
@@ -85,7 +86,7 @@ var Helloworld = cc.Layer.extend({
 	this.data = new Array();
 
 	this.heli = cc.Sprite.create(s_Heli1);
-	this.heli.setScale(0.5);
+	this.heli.setScale(0.4);
 	//this.heli.setScaleX(0.05);
 	this.lazyLayer.addChild(this.heli, 1);
 	
@@ -201,17 +202,20 @@ var Helloworld = cc.Layer.extend({
     onGameOver:function() {
         // add a label shows "Hello World"
         // create and initialize a label
-        this.helloLabel = cc.LabelTTF.create("GAME OVER", "Arial", 38);
+//        this.helloLabel = cc.LabelTTF.create("GAME OVER", "Arial", 38);
         // position the label on the center of the screen
 	var size = cc.Director.getInstance().getWinSize();
-        this.helloLabel.setPosition(size.width / 2, size.height / 2);
+      //  this.helloLabel.setPosition(size.width / 2, size.height / 2);
         // add the label as a child to this layer
-        this.addChild(this.helloLabel, 5);
-
+        //this.addChild(this.helloLabel, 5);
+	this.mGameOverImage = cc.MenuItemSprite.create(cc.Sprite.create(s_Gameover));
+	this.addChild(this.mGameOverImage);
+	this.mGameOverImage.setPosition(size.width / 2, size.height / 2);
+	
 	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Restart));
 	this.mRestartButton.setScale(0.5);
 	this.mRestartButton.setCallback(this.onRestart, this);
-	this.mRestartButton.setPosition(size.width/2, size.height/2 - 35);
+	this.mRestartButton.setPosition(size.width/2, size.height/2 - 80);
 	this.mMenu.addChild(this.mRestartButton);
         this.mIsGameOver = true;
     },
@@ -222,18 +226,18 @@ var Helloworld = cc.Layer.extend({
 			this.data[i] = Math.floor((Math.random() * 200) + 1);
 		}
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe[i].setPosition(size.width/2 + (18 * i), this.data[i]);
+		this.pipe[i].setPosition(size.width/2 + (15 * i), this.data[i]);
 		}
 		
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe2[i].setPosition(size.width/2 + (18 * i), this.data[i] + size.height*.75);
+		this.pipe2[i].setPosition(size.width/2 + (15 * i), this.data[i] + size.height*.75);
 	    }
 	    this.mIsRunning = true;
 	    this.mIsGameOver = false;
 	    this.heli.setVisible(true);
 	    this.heli.setPosition(size.width/4, size.height/2);
 	    this.mMenu.removeChild(this.mRestartButton);
-	    this.removeChild(this.helloLabel);
+	    this.removeChild(this.mGameOverImage);
     },
     onPause:function() {
 	    console.log("onPause");

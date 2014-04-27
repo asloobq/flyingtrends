@@ -34,6 +34,7 @@ var HomeLayer = cc.Layer.extend({
     optionsButton:null,
     creditsButton:null,
 	mBgImage:null,
+	mLogoImage:null,
     init:function () {
         //////////////////////////////
         // 1. super init first
@@ -61,15 +62,19 @@ var HomeLayer = cc.Layer.extend({
 		this.mBgImage = cc.Sprite.create(s_Clouds);
 		this.mBgImage.setPosition(size.width/2, size.height/2);
 		this.addChild(this.mBgImage);
+		
+		this.mLogoImage = cc.Sprite.create(s_Logo);
+		this.mLogoImage.setPosition(size.width/2 + 20, size.height-80);
+		this.addChild(this.mLogoImage);
         /////////////////////////////
         // 3. add your codes below...
         // add a label shows "Hello World"
         // create and initialize a label
-        this.helloLabel = cc.LabelTTF.create("FLYING TRENDS", "Arial", 38);
+        //this.helloLabel = cc.LabelTTF.create("FLYING TRENDS", "Arial", 38);
         // position the label on the center of the screen
-        this.helloLabel.setPosition(size.width / 2, size.height/2 + 100);
+        //this.helloLabel.setPosition(size.width / 2, size.height/2 + 100);
         // add the label as a child to this layer
-        this.addChild(this.helloLabel, 5);
+        //this.addChild(this.helloLabel, 5);
 
         var lazyLayer = cc.Layer.create();
         this.addChild(lazyLayer);
