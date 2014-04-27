@@ -29,7 +29,8 @@ var EXPLODE_FILE = "res/explode.mp3";
 var Helloworld = cc.Layer.extend({
     isMouseDown:false,
     helloImg:null,
-    //helloLabel:null,
+    mScore:0,
+    mScoreLabel:null,
     mPausedLabel:null,
     circle:null,
 	batchNode:null,
@@ -56,11 +57,11 @@ var Helloworld = cc.Layer.extend({
         // 1. super init first
         this._super();
 	
-	mAudioEngine = cc.AudioEngine.getInstance();
+	    mAudioEngine = cc.AudioEngine.getInstance();
         // set default volume
         mAudioEngine.setEffectsVolume(0.5);
         mAudioEngine.setMusicVolume(0.5);
-	cc.AudioEngine.getInstance().preloadEffect(EXPLODE_FILE);
+	    cc.AudioEngine.getInstance().preloadEffect(EXPLODE_FILE);
         /////////////////////////////
         // 2. add a menu item with "X" image, which is clicked to quit the program
         //    you may modify it.
@@ -71,12 +72,16 @@ var Helloworld = cc.Layer.extend({
 		this.mBgImage.setPosition(size.width/2, size.height/2);
 		this.addChild(this.mBgImage);
 		
-	this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Pause));
-	this.mPauseButton.setPosition(size.width - 40, size.height - 40);
-	this.mPauseButton.setCallback(this.onPause, this);
-	this.mMenu = cc.Menu.create(this.mPauseButton);
-	this.mMenu.setPosition(0,0);
-	this.addChild(this.mMenu, 1);
+	    this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Pause));
+	    this.mPauseButton.setPosition(size.width - 40, size.height - 40);
+	    this.mPauseButton.setCallback(this.onPause, this);
+	    this.mMenu = cc.Menu.create(this.mPauseButton);
+	    this.mMenu.setPosition(0,0);
+	    this.addChild(this.mMenu, 1);
+
+        this.mScoreLabel = cc.LabelTTF.create(this.mScore, "Arial", 24);
+        this.mScoreLabel.setPosition(size.width - 100, size.height - 40);
+        this.addChild(this.mScoreLabel, 1);
 
         this.lazyLayer = cc.Layer.create();
         this.addChild(this.lazyLayer);
@@ -161,6 +166,12 @@ var Helloworld = cc.Layer.extend({
                     this.pipe2[i].setPositionX(size.width/2 + (15 * i));
                 }
 			}	
+
+            //updateScore
+            this.mScore += this.speed;
+            if(this.mScore % 10 == 0) {
+                this.mScoreLabel.setString(this.mScore);
+            }
 			
 			if (this.isMouseDown) {
 				this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
@@ -178,8 +189,11 @@ var Helloworld = cc.Layer.extend({
         //    this._currentRotation = 180;
 	console.log("handleTouch x = ", touchLocation.x);
     },
+
+
     checkCollision:function() {
 	heliRect = this.heli.getBoundingBox();
+    
 	for(var i = 0; i < this.count; i++) {
 		pipe1Rect = this.pipe[i].getBoundingBox();
 		if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
@@ -203,24 +217,20 @@ var Helloworld = cc.Layer.extend({
 	this.onGameOver();
     },
     onGameOver:function() {
-        // add a label shows "Hello World"
-        // create and initialize a label
-//        this.helloLabel = cc.LabelTTF.create("GAME OVER", "Arial", 38);
-        // position the label on the center of the screen
-	var size = cc.Director.getInstance().getWinSize();
-      //  this.helloLabel.setPosition(size.width / 2, size.height / 2);
-        // add the label as a child to this layer
-        //this.addChild(this.helloLabel, 5);
-	this.mGameOverImage = cc.MenuItemSprite.create(cc.Sprite.create(s_Gameover));
-	this.addChild(this.mGameOverImage);
-	this.mGameOverImage.setPosition(size.width / 2, size.height / 2);
+
+	    var size = cc.Director.getInstance().getWinSize();
+      	this.mGameOverImage = cc.MenuItemSprite.create(cc.Sprite.create(s_Gameover));
+	    this.addChild(this.mGameOverImage);
+	    this.mGameOverImage.setPosition(size.width / 2, size.height / 2);
 	
-	this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Restart));
-	this.mRestartButton.setScale(0.5);
-	this.mRestartButton.setCallback(this.onRestart, this);
-	this.mRestartButton.setPosition(size.width/2, size.height/2 - 80);
-	this.mMenu.addChild(this.mRestartButton);
+	    this.mRestartButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Restart));
+	    this.mRestartButton.setScale(0.5);
+	    this.mRestartButton.setCallback(this.onRestart, this);
+	    this.mRestartButton.setPosition(size.width/2, size.height/2 - 80);
+	    this.mMenu.addChild(this.mRestartButton);
         this.mIsGameOver = true;
+        this.mScore = 0;
+
     },
     onRestart:function() {
 	    console.log("restart");
@@ -229,11 +239,11 @@ var Helloworld = cc.Layer.extend({
 			this.data[i] = Math.floor((Math.random() * 180) + 1);
 		}
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe[i].setPosition(size.width/2 + (15 * i), this.data[i]);
+		    this.pipe[i].setPosition(size.width/2 + (15 * i), this.data[i]);
 		}
 		
 	    for(var i = 0; i < this.count; i++) {
-		this.pipe2[i].setPosition(size.width/2 + (15 * i), this.data[i] + size.height*.75);
+		    this.pipe2[i].setPosition(size.width/2 + (15 * i), this.data[i] + size.height*.75);
 	    }
 	    this.mIsRunning = true;
 	    this.mIsGameOver = false;
@@ -241,6 +251,8 @@ var Helloworld = cc.Layer.extend({
 	    this.heli.setPosition(size.width/4, size.height/2);
 	    this.mMenu.removeChild(this.mRestartButton);
 	    this.removeChild(this.mGameOverImage);
+        this.mScore = 0;
+        this.mScoreLabel.setString(0);
     },
     onPause:function() {
 	    console.log("onPause");
