@@ -1,7 +1,7 @@
 flyingtrends
 ============
 Flappy Bird style game created using Cocos2d-JS.
-### [Demo](cs.binghamton.edu/~aquresh4/Misc/cocos2d-html5-v2.2.3/flyingtrends/)###
+### [Demo](http://cs.binghamton.edu/~aquresh4/Misc/cocos2d-html5-v2.2.3/flyingtrends/)###
 Todo:
 
 1. Add 3 lives.
