@@ -1,9 +1,5 @@
 /****************************************************************************
- Copyright (c) 2010-2012 cocos2d-x.org
- Copyright (c) 2008-2010 Ricardo Quesada
- Copyright (c) 2011      Zynga Inc.
-
- http://www.cocos2d-x.org
+ Copyright (c) 2014 Asloob Qureshi
 
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,8 +35,8 @@
         //SingleEngineFile:'',
         appFiles:[
             'src/resource.js',
-            'src/myApp.js',//add your own files in order here
-			'src/home.js'
+            'src/gameScene.js',//add your own files in order here
+			'src/homeScene.js'
         ]
     };
 

@@ -1,8 +1,6 @@
 /****************************************************************************
- Copyright (c) 2010-2012 cocos2d-x.org
- Copyright (c) 2008-2010 Asloob Qureshi
+ Copyright (c) 2014 Asloob Qureshi
 
- http://www.cocos2d-x.org
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -25,52 +23,51 @@
 
 var EXPLODE_FILE = "res/explode.mp3";
 
-var Helloworld = cc.Layer.extend({
+var GameLayer = cc.Layer.extend({
     isMouseDown:false,
-    helloImg:null,
     mScore:0,
     mScoreLabel:null,
     mPausedLabel:null,
-    circle:null,
-	batchNode:null,
-	ship:null,
 	mBgImage:null,
 	mGameOverImage:null,
-	pipe:null,
-	pipe2:null,
-	heli:null,
-	count:50,
-	data:null,
-	speed:1.5,
-    heliSpeed:1.5,
-    heliAnimation:null,
+	
+    mPipes1:null,
+	mPipes2:null,
+	mHeli:null,
+	mNoPipes:50,
+	mDataPoints:null,
+	mPipeSpeed:1.5,
+    mHeliSpeed:1.5,
+    mHeliAnimation:null,
     mIsRunning:true,
     mIsGameOver:false,
     mRestartButton:null,
     mPauseButton:null,
     mMenu:null,
-    lazyLayer:null,
+    mLazyLayer:null,
     mAudioEngine:null,
+    
     init:function () {
         //////////////////////////////
         // 1. super init first
         this._super();
 	
+        //Initialise AudioEngine (not working)
 	    mAudioEngine = cc.AudioEngine.getInstance();
         // set default volume
         mAudioEngine.setEffectsVolume(0.5);
         mAudioEngine.setMusicVolume(0.5);
 	    cc.AudioEngine.getInstance().preloadEffect(EXPLODE_FILE);
-        /////////////////////////////
-        // 2. add a menu item with "X" image, which is clicked to quit the program
-        //    you may modify it.
+       
         // ask director the window size
         var size = cc.Director.getInstance().getWinSize();
 
+        //Set background image
 		this.mBgImage = cc.Sprite.create(s_Clouds);
 		this.mBgImage.setPosition(size.width/2, size.height/2);
 		this.addChild(this.mBgImage);
 		
+        //Set Pause Button
 	    this.mPauseButton = cc.MenuItemSprite.create(cc.Sprite.create(s_Pause));
 	    this.mPauseButton.setPosition(size.width - 40, size.height - 40);
 	    this.mPauseButton.setCallback(this.onPause, this);
@@ -78,48 +75,55 @@ var Helloworld = cc.Layer.extend({
 	    this.mMenu.setPosition(0,0);
 	    this.addChild(this.mMenu, 1);
 
+        //Set Score label
         this.mScoreLabel = cc.LabelTTF.create(this.mScore, "Arial", 24);
         this.mScoreLabel.setPosition(size.width - 100, size.height - 40);
         this.addChild(this.mScoreLabel, 1);
 
-        this.lazyLayer = cc.Layer.create();
-        this.addChild(this.lazyLayer);
+        this.mLazyLayer = cc.Layer.create();
+        this.addChild(this.mLazyLayer);
  
-	this.pipe = new Array();
-	this.pipe2 = new Array();
-	this.data = new Array();
+        //Initialize the pipes and data-points
+	    this.mPipes1 = new Array();
+	    this.mPipes2 = new Array();
+	    this.mDataPoints = new Array();
 
-	this.heli = cc.Sprite.create(s_Heli1);
-	this.heli.setScale(0.4);
-	//this.heli.setScaleX(0.05);
-	this.lazyLayer.addChild(this.heli, 1);
+	    this.mHeli = cc.Sprite.create(s_Heli1);
+	    this.mHeli.setScale(0.4);
+	    
+	    this.mLazyLayer.addChild(this.mHeli, 1);
 	
-	
-	for(var i = 0; i < this.count; i++) {
-		this.pipe[i] = cc.Sprite.create(s_Pipe1);
-		this.lazyLayer.addChild(this.pipe[i], 1);
-		this.pipe[i].setScale(0.1);
-	}
-	for(var i = 0; i < this.count; i++) {
-		this.pipe2[i] = cc.Sprite.create(s_Pipe2);
-		this.lazyLayer.addChild(this.pipe2[i], 1);
-		this.pipe2[i].setScale(0.1);
-	}
-	this.onRestart();	
+	    //Create pipes
+	    for(var i = 0; i < this.mNoPipes; i++) {
+		    this.mPipes1[i] = cc.Sprite.create(s_Pipe1);
+		    this.mPipes1[i].setScale(0.1);
+		    this.mLazyLayer.addChild(this.mPipes1[i], 1);
+	    }
+
+	    for(var i = 0; i < this.mNoPipes; i++) {
+		    this.mPipes2[i] = cc.Sprite.create(s_Pipe2);
+		    this.mPipes2[i].setScale(0.1);
+		    this.mLazyLayer.addChild(this.mPipes2[i], 1);
+	    }
+
+	    this.onRestart();	
         this.setTouchEnabled(true);
-	this.setKeyboardEnabled(true);
-	this.scheduleUpdate();
+	    this.setKeyboardEnabled(true);
+	    this.scheduleUpdate();
+
         return true;
     },
+
+
     buildAnimation:function() {
 	    //Not working
 	//create an animation object
 	var animation = cc.Animation.create();
 
 	//add a sprite frame to this animation
-	animation.addFrameWithFile("heli.png");
+	//animation.addFrameWithFile("heli.png");
 
-	animation.addFrameWithFile("heli2.png");
+	//animation.addFrameWithFile("heli2.png");
 	
 	animation.setDelayPerUnit(2);
 
@@ -127,16 +131,22 @@ var Helloworld = cc.Layer.extend({
 	var animate = cc.Animate.create(animation);
 
 	//run animate
-	this.heli.runAction(cc.RepeatForever.create(animate));
+	this.mHeli.runAction(cc.RepeatForever.create(animate));
     },
+
+
     // a selector callback
     menuCloseCallback:function (sender) {
         cc.Director.getInstance().end();
     },
+
+
     onTouchesBegan:function (touches, event) {
         this.isMouseDown = true;
-	//this.heli.setPositionY(this.heli.getPositionY() + (this.speed * 20));
+	//this.heli.setPositionY(this.heli.getPositionY() + (this.mPipeSpeed * 20));
     },
+
+
     onTouchesMoved:function (touches, event) {
         if (this.isMouseDown) {
             if (touches) {
@@ -144,42 +154,54 @@ var Helloworld = cc.Layer.extend({
             }
         }
     },
+
+
     onTouchesEnded:function (touches, event) {
         this.isMouseDown = false;
     },
+
+
     onTouchesCancelled:function (touches, event) {
         console.log("onTouchesCancelled");
     },
+
+
 	update:function (dt) {
 		//if game is running then call update on pipe
         var size = cc.Director.getInstance().getWinSize();
-		if(this.mIsRunning) {
-			for(var i = 0; i < this.count; i++) {
-				this.pipe[i].setPositionX(this.pipe[i].getPositionX() - this.speed);
-				this.pipe2[i].setPositionX(this.pipe2[i].getPositionX() - this.speed);			
-                if(this.pipe[i].getPositionX() < 0) {
-                    this.pipe[i].setPositionX(size.width/2 + (15 * i));
+	
+        if(this.mIsRunning) {
+			for(var i = 0; i < this.mNoPipes; i++) {
+
+				this.mPipes1[i].setPositionX(this.mPipes1[i].getPositionX() - this.mPipeSpeed);
+				this.mPipes2[i].setPositionX(this.mPipes2[i].getPositionX() - this.mPipeSpeed);			
+                
+                if(this.mPipes1[i].getPositionX() < 0) {
+                    this.mPipes1[i].setPositionX(size.width/2 + (15 * i));
                 }
                 
-                if(this.pipe2[i].getPositionX() < 0) {
-                    this.pipe2[i].setPositionX(size.width/2 + (15 * i));
+                if(this.mPipes2[i].getPositionX() < 0) {
+                    this.mPipes2[i].setPositionX(size.width/2 + (15 * i));
                 }
 			}	
 
             //updateScore
-            this.mScore += this.speed;
+            this.mScore += this.mPipeSpeed;
             if(this.mScore % 10 == 0) {
                 this.mScoreLabel.setString(this.mScore);
             }
 			
 			if (this.isMouseDown) {
-				this.heli.setPositionY(this.heli.getPositionY() + this.heliSpeed);
+				this.mHeli.setPositionY(this.mHeli.getPositionY() + this.mHeliSpeed);
 			} else {
-				this.heli.setPositionY(this.heli.getPositionY() - this.heliSpeed);
+				this.mHeli.setPositionY(this.mHeli.getPositionY() - this.mHeliSpeed);
 			}
+
 			this.checkCollision();
 		}
 	},
+
+
 	 handleTouch:function(touchLocation)
     {
        // if(touchLocation.x < 300)
@@ -191,32 +213,37 @@ var Helloworld = cc.Layer.extend({
 
 
     checkCollision:function() {
-	heliRect = this.heli.getBoundingBox();
+	    heliRect = this.mHeli.getBoundingBox();
     
-	for(var i = 0; i < this.count; i++) {
-		pipe1Rect = this.pipe[i].getBoundingBox();
-		if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
-			console.log("checkCollision collision with i = ", i);
-			this.onCollision();
-			return;
-		}
-		pipe2Rect = this.pipe2[i].getBoundingBox();
-		if (cc.rectIntersectsRect(heliRect, pipe2Rect)) {
-			console.log("checkCollision collision with i = ", i);
-			this.onCollision();
-			return;
-		}
-	}
+	    for(var i = 0; i < this.mNoPipes; i++) {
+		    pipe1Rect = this.mPipes1[i].getBoundingBox();
+		    if (cc.rectIntersectsRect(heliRect, pipe1Rect)) {
+			    console.log("checkCollision collision with i = ", i);
+			    this.onCollision();
+			    return;
+		    }
+		    pipe2Rect = this.mPipes2[i].getBoundingBox();
+		    if (cc.rectIntersectsRect(heliRect, pipe2Rect)) {
+			    console.log("checkCollision collision with i = ", i);
+			    this.onCollision();
+			    return;
+		    }
+	    }
     },
+
+
     onCollision:function() {
     	//this.mAudioEngine.playEffect(EFFECT_FILE);
-	cc.AudioEngine.getInstance().playEffect(EXPLODE_FILE);
-	this.heli.setVisible(false);
-	this.mIsRunning = false;
-	this.onGameOver();
+	    cc.AudioEngine.getInstance().playEffect(EXPLODE_FILE);
+	    this.mHeli.setVisible(false);
+	    this.mIsRunning = false;
+	    this.onGameOver();
     },
+
+
     onGameOver:function() {
 
+        //Display game over message and show high scores
 	    var size = cc.Director.getInstance().getWinSize();
       	this.mGameOverImage = cc.MenuItemSprite.create(cc.Sprite.create(s_Gameover));
 	    this.addChild(this.mGameOverImage);
@@ -231,54 +258,63 @@ var Helloworld = cc.Layer.extend({
         this.mScore = 0;
 
     },
+
+
     onRestart:function() {
 	    console.log("restart");
 	    var size = cc.Director.getInstance().getWinSize();
-	    for(var i = 0; i < this.count; i++) {
-			this.data[i] = Math.floor((Math.random() * 180) + 1);
+	    
+        //Move pipes to original posiiton
+        for(var i = 0; i < this.mNoPipes; i++) {
+			this.mDataPoints[i] = Math.floor((Math.random() * 180) + 1);
 		}
-	    for(var i = 0; i < this.count; i++) {
-		    this.pipe[i].setPosition(size.width/2 + (15 * i), this.data[i]);
+	
+        for(var i = 0; i < this.mNoPipes; i++) {
+		    this.mPipes1[i].setPosition(size.width/2 + (15 * i), this.mDataPoints[i]);
 		}
 		
-	    for(var i = 0; i < this.count; i++) {
-		    this.pipe2[i].setPosition(size.width/2 + (15 * i), this.data[i] + size.height*.75);
+	    for(var i = 0; i < this.mNoPipes; i++) {
+		    this.mPipes2[i].setPosition(size.width/2 + (15 * i), this.mDataPoints[i] + size.height*.75);
 	    }
+
 	    this.mIsRunning = true;
 	    this.mIsGameOver = false;
-	    this.heli.setVisible(true);
-	    this.heli.setPosition(size.width/4, size.height/2);
+	    this.mHeli.setVisible(true);
+	    this.mHeli.setPosition(size.width/4, size.height/2);
 	    this.mMenu.removeChild(this.mRestartButton);
 	    this.removeChild(this.mGameOverImage);
         this.mScore = 0;
         this.mScoreLabel.setString(0);
     },
+
+
     onPause:function() {
 	    console.log("onPause");
 	    if(this.mIsGameOver) {
 		    return;
 	    }
-	if(this.mIsRunning) {
-		this.mIsRunning = false;
-		        // create and initialize a label
+	    if(this.mIsRunning) {
+		    
+            this.mIsRunning = false;
+		    // create and initialize a label
 	        this.mPauseLabel = cc.LabelTTF.create("PAUSED", "Arial", 38);
         	// position the label on the center of the screen
-		var size = cc.Director.getInstance().getWinSize();
+		    var size = cc.Director.getInstance().getWinSize();
 	        this.mPauseLabel.setPosition(size.width / 2, size.height / 2);
 	        // add the label as a child to this layer
 	        this.addChild(this.mPauseLabel, 5);
 
-	} else {
-		this.mIsRunning = true;
-		this.removeChild(this.mPauseLabel);
-	}
+	    } else {
+		    this.mIsRunning = true;
+		    this.removeChild(this.mPauseLabel);
+	    }
     }
 });
 
-var HelloWorldScene = cc.Scene.extend({
+var GameScene = cc.Scene.extend({
     onEnter:function () {
         this._super();
-        var layer = new Helloworld();
+        var layer = new GameLayer();
         layer.init();
         this.addChild(layer);
     }
