@@ -12,8 +12,14 @@ Todo:
 6. Save high scores.
 7. Make it Social.
 8. Increasing difficulty levels.
-9. Clean up Code.
 
+
+### Setting up development environment ###
+
+1. Download the Cocos2d-JS SDK from [the cocos2d-x download page] (http://cocos2d-x.org/download) . (Direct Link to SDK [here](http://cdn.cocos2d-x.org/cocos2d-html5-v2.2.3.zip))
+2. Unzip the file anywhere on disk (/cocos2djs).
+3. Clone this repository in the cocos2djs folder (/cocos2djs/flyingtrends).
+4. Open index.html in a browser (/cocos2djs/flyingtrends/index.html). If the game does not run then you probably need to use a server like wamp. More help [here](http://cocos2d-x.org/wiki/Cocos2d-js).
 
 
 ### Legal ###
